@@ -32,6 +32,10 @@ services:
       # package.json, context data, etc.
       - nodered_data:/data
 
+    #Gibt den Port direkt im lokalen Netzwerk deines Linux-Servers frei
+    ports:
+      - "1880:1880"
+
     # Coolify's reverse proxy connects to this port.
     # No public host port is required.
     expose:
