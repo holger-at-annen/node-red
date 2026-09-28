@@ -3,8 +3,7 @@ set -eu
 
 echo "Verifying data volume ownership..."
 
-# Best Practice: Ensure the /data directory and everything inside it 
-# belongs to the 'node-red' user (UID 1000).
+# Ensure the /data directory belongs to the 'node-red' user (UID 1000).
 chown -R 1000:1000 /data
 
 # Check required variables.
@@ -34,8 +33,8 @@ unset NODERED_ADMIN_PASSWORD
 echo "Node-RED authentication configured for user: ${NODERED_ADMIN_USERNAME}"
 echo "Starting Node-RED as user 'node-red'..."
 
-# Best Practice: Drop root privileges cleanly using gosu right as the process starts.
-# Using 'exec' ensures Node-RED receives OS shutdown signals (SIGTERM) properly.
-exec gosu node-red node-red \
+# Drop root privileges cleanly using su-exec.
+# 'exec' ensures Node-RED receives OS shutdown signals (SIGTERM) properly.
+exec su-exec node-red node-red \
     --userDir /data \
     --settings /opt/nodered-settings/settings.js
