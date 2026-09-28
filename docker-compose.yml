@@ -32,10 +32,6 @@ services:
       # package.json, context data, etc.
       - nodered_data:/data
 
-    #Gibt den Port direkt im lokalen Netzwerk deines Linux-Servers frei
-    ports:
-      - "1880:1880"
-
     # Coolify's reverse proxy connects to this port.
     # No public host port is required.
     expose:
@@ -56,6 +52,19 @@ services:
       retries: 3
       start_period: 30s
 
+    # DYNAMISCHE TRAEFIK LABELS FÜR WEBSOCKET-KOMPATIBILITÄT:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.innovaphone-nodered.entrypoints=http"
+      # Nutzt Coolifys FQDN-Variable, um den Host-Header dynamisch zu matchen:
+      - "traefik.http.routers.innovaphone-nodered.rule=Host(`${FQDN}`)"
+      - "traefik.http.routers.innovaphone-nodered.service=innovaphone-nodered-service"
+      - "traefik.http.services.innovaphone-nodered-service.loadbalancer.server.port=1880"
+      
+      # Zwingt Traefik dazu, HTTP/2-Streaming für diesen Router zu unterdrücken,
+      # damit die WebSocket-Upgrade-Header unbeschädigt ankommen:
+      - "traefik.http.routers.innovaphone-nodered.middlewares=innovaphone-ws-headers"
+      - "traefik.http.middlewares.innovaphone-ws-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
 
 volumes:
   nodered_data:
