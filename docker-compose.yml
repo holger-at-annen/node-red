@@ -1,19 +1,57 @@
 services:
   nodered:
+
     build:
       context: .
       dockerfile: Dockerfile
 
     environment:
-      NODERED_ADMIN_USERNAME: ${SERVICE_USER_NODERED}
-      NODERED_ADMIN_PASSWORD: ${SERVICE_PASSWORD_64_NODERED}
-      NODE_RED_CREDENTIAL_SECRET: ${SERVICE_REALBASE64_64_NODERED}
+
+      # Container timezone.
+      TZ: ${TZ:-Europe/Luxembourg}
+
+      # Node-RED login credentials.
+      #
+      # These are generated/managed by Coolify.
+      # You can change the username and password directly
+      # in Coolify's Environment Variables.
+      NODERED_ADMIN_USERNAME: ${SERVICE_USER_NODERED:?}
+      NODERED_ADMIN_PASSWORD: ${SERVICE_PASSWORD_64_NODERED:?}
+
+      # Persistent encryption key for Node-RED credentials.
+      #
+      # IMPORTANT: Do not change this after Node-RED
+      # has stored encrypted credentials.
+      NODE_RED_CREDENTIAL_SECRET: ${SERVICE_REALBASE64_64_NODERED:?}
 
     volumes:
+
+      # Persistent Node-RED user data.
+      #
+      # This contains flows, credentials, installed nodes,
+      # package.json, context data, etc.
       - nodered_data:/data
 
+    # Coolify's reverse proxy connects to this port.
+    # No public host port is required.
     expose:
       - "1880"
+
+    restart: unless-stopped
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:1880', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
 
 volumes:
   nodered_data:
