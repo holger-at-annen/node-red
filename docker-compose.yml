@@ -57,7 +57,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.innovaphone-nodered.entrypoints=http"
       # Nutzt Coolifys FQDN-Variable, um den Host-Header dynamisch zu matchen:
-      - "traefik.http.routers.innovaphone-nodered.rule=Host(`${FQDN}`)"
+      - "traefik.http.routers.innovaphone-nodered.rule=Host((`${Coolify_URL}`)"
       - "traefik.http.routers.innovaphone-nodered.service=innovaphone-nodered-service"
       - "traefik.http.services.innovaphone-nodered-service.loadbalancer.server.port=1880"
       
