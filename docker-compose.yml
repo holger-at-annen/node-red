@@ -1,0 +1,19 @@
+services:
+  nodered:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    environment:
+      NODERED_ADMIN_USERNAME: ${SERVICE_USER_NODERED}
+      NODERED_ADMIN_PASSWORD: ${SERVICE_PASSWORD_64_NODERED}
+      NODE_RED_CREDENTIAL_SECRET: ${SERVICE_REALBASE64_64_NODERED}
+
+    volumes:
+      - nodered_data:/data
+
+    expose:
+      - "1880"
+
+volumes:
+  nodered_data:
