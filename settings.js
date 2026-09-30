@@ -7,6 +7,9 @@ module.exports = {
      */
     uiPort: process.env.PORT || 1880,
 
+    functionGlobalContext: {
+        crypto: require("crypto")
+    },
 
     /*
      * Node-RED editor authentication.
